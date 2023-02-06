@@ -1,0 +1,41 @@
+version: '3'
+
+services:
+  mailhog:
+    container_name: mail
+    image: mailhog/mailhog
+    ports:
+      - 1025:1025 #smtp server
+      - 5001:8025 #web ui
+
+  db:
+    container_name: mail_service_db
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_DB: mail_service
+      POSTGRES_USER: mail_service
+      POSTGRES_PASSWORD: mail_service
+      PGDATA: /data/postgres
+    ports:
+      - 5002:5432
+    volumes:
+      - postgres-db:/data/postgres
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    restart: always
+    ports:
+      - 5672:5672
+      - 5003:15672
+    volumes:
+      - "./docker/rabbitmq:/var/lib/rabbitmq"
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=admin
+
+
+volumes:
+  postgres-db:
+    driver: local
